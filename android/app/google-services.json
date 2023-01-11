@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "30890217547",
+    "project_id": "chat-app-eccfd",
+    "storage_bucket": "chat-app-eccfd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30890217547:android:d17566f9b893f1a361bdce",
+        "android_client_info": {
+          "package_name": "com.example.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "30890217547-esuct7vi9eb5v89r1khr6el9j679m81b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3h3Y7GCtY4wKqTvsTiOZEfCzRPT_yhfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "30890217547-esuct7vi9eb5v89r1khr6el9j679m81b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
