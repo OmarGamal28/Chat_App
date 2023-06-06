@@ -1,4 +1,6 @@
 import 'package:chatapp/presentation/pages/chat_page.dart';
+import 'package:chatapp/presentation/pages/cubits/login_cubit/login_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../component/login_page_component.dart';
 import 'package:chatapp/presentation/pages/register_page.dart';
@@ -7,16 +9,10 @@ import '../../core/app_constants.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'cubits/login_cubit/login_state.dart';
 
 
-class LoginPage extends StatefulWidget {
-   const LoginPage({Key? key}) : super(key: key);
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
+class LoginPage extends StatelessWidget {
   GlobalKey<FormState> formKey = GlobalKey();
 
   bool isLoading = false;
@@ -26,118 +22,116 @@ class _LoginPageState extends State<LoginPage> {
   String? password;
 
   @override
-  Widget build(BuildContext context){
-    return ModalProgressHUD(
-      inAsyncCall: isLoading,
-      child: Scaffold(
-        backgroundColor: primaryColor,
-        body: Form(
-          key: formKey,
-          child: ListView(
-            children: [
-              const SizedBox(height: 60,),//لو انا مش عارف المساحهه
-              Image.asset('assets/images/scholar.png',height: 100.0,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Scholar Chat',
-                    style: TextStyle(
-                      fontFamily:'pacifico',
-                      fontSize: 32,
-                      color: Colors.white
-                    ),
+  Widget build(BuildContext context) {
+    return BlocConsumer<LoginCubit, LoginState>(
+      listener: (context, state) {
+        if(state is LoginLoading){
+          isLoading = true;
+        }else if(state is LoginSuccess){
+          Navigator.push(context, MaterialPageRoute(builder: (
+              context) => ChatPage(email: email!,),),);
+          isLoading = false;
 
-                  ),
-                ],
-              ),
-              const SizedBox(height: 60,),
 
-              Padding(
+        }else if(state is LoginError){
+          showSnackBar(context, state.error,Colors.white12);
+          isLoading = false;
 
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+        }
+      },
+      builder:(context,state)=> ModalProgressHUD(
+        inAsyncCall: isLoading,
+        child: Scaffold(
+          backgroundColor: primaryColor,
+          body: Form(
+            key: formKey,
+            child: ListView(
+              children: [
+                const SizedBox(height: 60,), //لو انا مش عارف المساحهه
+                Image.asset('assets/images/scholar.png', height: 100.0,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text(
-
-                      'LOGIN',
+                      'Scholar Chat',
                       style: TextStyle(
-                        fontSize: 32,
-                        color: Colors.white,
-
+                          fontFamily: 'pacifico',
+                          fontSize: 32,
+                          color: Colors.white
                       ),
+
                     ),
                   ],
                 ),
-              ),
-              textFormField(
-                  lable: 'Email',
-                obscure: false,
-                onChanged: (data){
-                    email = data;
-                }
-              ),
-              textFormField(
-                obscure: true,
-                  lable: 'Password',
-                onChanged: (data){
-                    password = data;
-                }
-              ),
-              defaultMaterialButton(
-                  text: 'LOGIN',
-                function: () async{
-                    if(formKey.currentState!.validate()){
-                      isLoading = true;
-                      setState(() {
+                const SizedBox(height: 60,),
 
-                      });
-                      try {
-                        UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                          email: email!,
-                          password: password!,
-                        );
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatPage(email: email!,),),);
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'user-not-found') {
-                          showSnackBar(context,'user-not-found',Colors.red);
-                        } else if (e.code == 'wrong-password') {
-                          showSnackBar(context,'wrong-password',Colors.red);
-                        }
+                Padding(
+
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+
+                        'LOGIN',
+                        style: TextStyle(
+                          fontSize: 32,
+                          color: Colors.white,
+
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                textFormField(
+                    lable: 'Email',
+                    obscure: false,
+                    onChanged: (data) {
+                      email = data;
+                    }
+                ),
+                textFormField(
+                    obscure: true,
+                    lable: 'Password',
+                    onChanged: (data) {
+                      password = data;
+                    }
+                ),
+                defaultMaterialButton(
+                    text: 'LOGIN',
+                    function: () async {
+                      if (formKey.currentState!.validate()) {
+                        BlocProvider.of<LoginCubit>(context).loginUser(email: email!, password: password!);
                       }
-                      isLoading = false;
-                      setState(() {
-
-                      });
                     }
 
-                }
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
 
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-
-                children: [
-                  const Text(
-                    'dont have an account sign up',
-                    style: TextStyle(
-                      color: Colors.white
+                  children: [
+                    const Text(
+                      'dont have an account sign up',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
                     ),
-                  ),
-                  TextButton(onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return RegisterPage();
-                    }));
-                  },
-                      child: const Text(
-                    'Register'
-                  ))
-                ],
-              ),
+                    TextButton(onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (
+                          context) {
+                        return RegisterPage();
+                      }));
+                    },
+                        child: const Text(
+                            'Register'
+                        ))
+                  ],
+                ),
 
 
-            ],
+              ],
+            ),
           ),
         ),
       ),
