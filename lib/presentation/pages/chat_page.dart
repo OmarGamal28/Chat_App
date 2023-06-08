@@ -74,7 +74,7 @@ class ChatPage extends StatelessWidget {
                     color: primaryColor,
 
                   ),
-                  labelText: 'Send Message',
+                  labelText: 'Send message',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(color: primaryColor)),
